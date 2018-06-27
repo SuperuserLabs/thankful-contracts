@@ -1,3 +1,5 @@
+.PHONY: build test
+
 build:
 	truffle compile
 
