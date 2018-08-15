@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.24;
 
 // TODO: Refactor into Donator and AddressRegistrar
 contract Thankful {
@@ -42,7 +42,6 @@ contract Thankful {
     // Refund pending transaction that has expired
     function refund(string _email, uint32 _pending_idx) public {
         require(pending[_email].donations[_pending_idx].expires < now);
-        assert(pending[_email].donations[_pending_idx].expires < now);
         delete pending[_email].donations[_pending_idx];
         pending[_email].refunded += 1;
     }
@@ -50,16 +49,15 @@ contract Thankful {
     // Pay out last pending transaction for creator if email has an assigned address
     function payOut(string _email) public returns (bool) {
         address creator_address = creators[_email].addr;
-        if(creator_address != 0x0 && pending[_email].n_pending > 0) {
-            Donation storage d = pending[_email].donations[idx];
-            if(d.amount != 0x0) {
-                uint idx = pending[_email].n_pending - 1;
-                creator_address.transfer(d.amount);
-            } else {
-                pending[_email].n_pending--;
-                return false;
-            }
-
+        require(creator_address != 0x0 && pending[_email].n_pending > 0);
+        Donation storage d = pending[_email].donations[idx];
+        if(d.amount != 0x0) {
+            uint idx = pending[_email].n_pending - 1;
+            creator_address.transfer(d.amount);
+            return true;
+        } else {
+            pending[_email].n_pending--;
+            return false;
         }
     }
 }
