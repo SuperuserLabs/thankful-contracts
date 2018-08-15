@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openzeppelin-solidity": "1.10.0"
+    "openzeppelin-solidity": "1.10.0",
+    "truffle": "^4.1.14"
   }
 }

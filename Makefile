@@ -1,7 +1,7 @@
 .PHONY: build test
 
 build:
-	truffle compile
+	npx truffle compile
 
 test:
-	truffle test
+	npx truffle test
