@@ -10,11 +10,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MPL-2.0",
   "dependencies": {
     "ganache-cli": "^6.1.7",
     "openzeppelin-solidity": "1.10.0",
     "truffle": "^4.1.14",
-    "web3": "^1.0.0-beta.35"
+    "web3": "^1.0.0-beta.35",
+    "websocket": "^1.0.26"
   }
 }
