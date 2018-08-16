@@ -4,28 +4,22 @@ const assert = require('assert');
 const ganache = require('ganache-cli');
 const Web3 = require('web3');
 const web3 = new Web3(ganache.provider());
-const json = require('./../build/contracts/Thankful.json');
 
-let accounts;
-let contract;
-let manager;
+const Thankful = artifacts.require("Thankful");
 
-const interface = json['abi'];
-const bytecode = json['bytecode'];
-
-beforeEach(async () => {
-      accounts = await web3.eth.getAccounts();
-      manager = accounts[0];
-      contract = await new web3.eth.Contract(interface)
-          .deploy({ data: bytecode })
-          .send({ from: manager, gas: '1000000' });
-});
-
-
-describe('Thankful', () => {
-	it('deploys a contract', async () => {
-		//const contractManager = await contract.methods.manager().call();
-		//assert.equal(manager, contractManager, 'The manager is the one who launches the smart contract.');
-	});
-	//Continue from this line from now on...
+contract('Thankful', async (accounts) => {
+    it("donate, associate, and payOut", async () => {
+        let instance = await Thankful.deployed();
+        console.log(instance);
+        console.log(accounts[0])
+        await instance.donate("erik@bjareho.lt", 1000, {from: accounts[0], value: 1000});
+        //await instance.associate("erik@bjareho.lt", accounts[0], {from: accounts[0]});
+        let balance = await web3.eth.getBalance(instance.address);
+        console.log(balance);
+        let account0_bal = await web3.eth.getBalance(accounts[0]);
+        console.log(account0_bal);
+        //await instance.payOut.call("erik@bjareho.lt");
+        return true;
+        //assert.equal(instance.valueOf(), 10000, "10000 wasn't in the first account");
+    });
 });

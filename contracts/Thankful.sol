@@ -23,10 +23,11 @@ contract Thankful {
         uint refunded;
     }
 
-    /// Donate to a creator, add to pending if email has no connected address.
+    // Donate to a creator, add to pending if email has no connected address.
     function donate(string _email, uint32 _expires_in) public payable {
+        require(msg.value > 0);
         if(creators[_email].addr != 0x0) {
-            // TODO: Send donation directly
+            creators[_email].addr.transfer(msg.value);
         } else {
             pending[_email].donations.push(Donation(msg.sender, msg.value, block.timestamp + _expires_in));
         }
@@ -34,9 +35,8 @@ contract Thankful {
 
     // Associate an email with a wallet address
     function associate(string _email, address _address) public {
-        if(msg.sender == verifier) {
-            creators[_email].addr = _address;
-        }
+        require(msg.sender == verifier);
+        creators[_email].addr = _address;
     }
 
     // Refund pending transaction that has expired
