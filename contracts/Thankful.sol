@@ -2,6 +2,8 @@ pragma solidity ^0.4.24;
 
 // TODO: Refactor into Donator and AddressRegistrar
 contract Thankful {
+    // TODO: Assign verifier (make contract Ownable)
+    // https://medium.com/codexprotocol/a-simple-framework-for-deploying-ownable-contracts-63ed4bd3c657
     address verifier;
 
     mapping(string => PendingDonations) pending;
