@@ -1,5 +1,8 @@
-var AddressRegistrar = artifacts.require("AddressRegistrar");
+let AddressRegistrar = artifacts.require("AddressRegistrar");
+let DonationHandler = artifacts.require("DonationHandler");
 
-module.exports = function(deployer) {
-    deployer.deploy(AddressRegistrar);
+module.exports = async function(deployer) {
+    deployer.deploy(AddressRegistrar).then(() => {
+        return deployer.deploy(DonationHandler, AddressRegistrar.address);
+    });
 };

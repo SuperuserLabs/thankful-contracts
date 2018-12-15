@@ -6,6 +6,7 @@ const assert = require('assert');
 //const web3 = new Web3(ganache.provider({"default_balance_ether": 1}));
 
 const AddressRegistrar = artifacts.require("AddressRegistrar");
+const DonationHandler = artifacts.require("DonationHandler");
 
 contract('AddressRegistrar', async (accounts) => {
     it("print account balances", async () => {
@@ -16,24 +17,26 @@ contract('AddressRegistrar', async (accounts) => {
     })
 
     it("donate, associate, and payOut", async () => {
-        let instance = await AddressRegistrar.deployed();
+        let registrar = await AddressRegistrar.deployed();
+        let dh = await DonationHandler.deployed();
+
         let verifier = accounts[0];
         let supporter = accounts[1];
         let creator = accounts[2];
 
         // Donate to email address
-        await instance.donate("erik@bjareho.lt", 1000, {from: supporter, value: 1000});
+        await dh.donate("erik@bjareho.lt", 1000, {from: supporter, value: 1000});
 
         // Associate email with Ethereum address
-        await instance.associate("erik@bjareho.lt", creator, {from: verifier});
+        await registrar.associate("erik@bjareho.lt", creator, {from: verifier});
 
-        let balance = (await web3.eth.getBalance(instance.address)).toString();
+        let balance = (await web3.eth.getBalance(dh.address)).toString();
         assert.equal(balance, "1000");
 
-        await instance.payOut("erik@bjareho.lt", {from: creator});
+        await dh.payOut("erik@bjareho.lt", {from: creator});
 
         // Ensure all was payed out
-        balance = (await web3.eth.getBalance(instance.address)).toString();
+        balance = (await web3.eth.getBalance(dh.address)).toString();
         assert.equal(balance, "0");
         //assert.equal(instance.valueOf(), 10000, "10000 wasn't in the first account");
         return true;
