@@ -1,5 +1,5 @@
-var Thankful = artifacts.require("Thankful");
+var AddressRegistrar = artifacts.require("AddressRegistrar");
 
 module.exports = function(deployer) {
-  deployer.deploy(Thankful);
+    deployer.deploy(AddressRegistrar);
 };

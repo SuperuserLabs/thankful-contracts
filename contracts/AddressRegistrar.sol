@@ -4,10 +4,15 @@ pragma solidity ^0.4.24;
 contract AddressRegistrar {
     // TODO: Assign verifier (make contract Ownable)
     // https://medium.com/codexprotocol/a-simple-framework-for-deploying-ownable-contracts-63ed4bd3c657
-    address verifier;
+    // The owner is the verifier
+    address public owner;
 
     mapping(string => PendingDonations) pending;
     mapping(string => Creator) creators;
+
+    constructor() public {
+        owner = msg.sender;
+    }
 
     struct Creator {
         address addr;
@@ -32,12 +37,13 @@ contract AddressRegistrar {
             creators[_email].addr.transfer(msg.value);
         } else {
             pending[_email].donations.push(Donation(msg.sender, msg.value, now + _expires_in));
+            pending[_email].n_pending++;
         }
     }
 
     // Associate an email with a wallet address
     function associate(string _email, address _address) public {
-        require(msg.sender == verifier);
+        require(msg.sender == owner);
         creators[_email].addr = _address;
     }
 
@@ -45,7 +51,7 @@ contract AddressRegistrar {
     function refund(string _email, uint32 _pending_idx) public {
         require(now > pending[_email].donations[_pending_idx].expires);
         delete pending[_email].donations[_pending_idx];
-        pending[_email].refunded += 1;
+        pending[_email].refunded++;
     }
 
     // Pay out last pending transaction for creator if email has an assigned address
