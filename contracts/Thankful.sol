@@ -31,7 +31,7 @@ contract Thankful {
         if(creators[_email].addr != 0x0) {
             creators[_email].addr.transfer(msg.value);
         } else {
-            pending[_email].donations.push(Donation(msg.sender, msg.value, block.timestamp + _expires_in));
+            pending[_email].donations.push(Donation(msg.sender, msg.value, now + _expires_in));
         }
     }
 
@@ -43,7 +43,7 @@ contract Thankful {
 
     // Refund pending transaction that has expired
     function refund(string _email, uint32 _pending_idx) public {
-        require(pending[_email].donations[_pending_idx].expires < now);
+        require(now > pending[_email].donations[_pending_idx].expires);
         delete pending[_email].donations[_pending_idx];
         pending[_email].refunded += 1;
     }
