@@ -6,6 +6,9 @@ build:
 develop:
 	npx truffle develop
 
+ganache:
+	npx ganache-cli --port 9545
+
 stop-develop:
 	kill $$(ps -x | grep ganache | awk '{print $$1;}')
 

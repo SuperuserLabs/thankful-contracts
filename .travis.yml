@@ -7,7 +7,7 @@ install:
 
 script:
  - make build
- - npx ganache-cli --port 9545 &
+ - make ganache &
  - sleep 5s
  - make migrate
  - make test
