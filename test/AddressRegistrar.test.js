@@ -5,11 +5,11 @@ const ganache = require('ganache-cli');
 const Web3 = require('web3');
 const web3 = new Web3(ganache.provider());
 
-const Thankful = artifacts.require("Thankful");
+const AddressRegistrar = artifacts.require("AddressRegistrar");
 
-contract('Thankful', async (accounts) => {
+contract('AddressRegistrar', async (accounts) => {
     it("donate, associate, and payOut", async () => {
-        let instance = await Thankful.deployed();
+        let instance = await AddressRegistrar.deployed();
         console.log(instance);
         console.log(accounts[0])
         await instance.donate("erik@bjareho.lt", 1000, {from: accounts[0], value: 1000});
