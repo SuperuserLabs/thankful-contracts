@@ -16,6 +16,15 @@ make test  # run tests
 ```
 
 
+For details about how to debug, see this guide: https://truffleframework.com/tutorials/debugging-a-smart-contract
+
+Summary of the guide:
+
+```sh
+npx truffle debug <txid>
+```
+
+
 ## Guides
 
  - [OpenZeppelin intro to smart contracts](https://blog.zeppelin.solutions/the-hitchhikers-guide-to-smart-contracts-in-ethereum-848f08001f05)
