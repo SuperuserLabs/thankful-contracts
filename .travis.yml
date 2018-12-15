@@ -3,9 +3,14 @@ node_js:
   - "8"
 
 install:
- - npm install truffle
  - npm install
 
 script:
  - make build
+ - make ganache > ganache.log &
+ - sleep 5s
+ - make migrate
  - make test
+
+after_script:
+ - cat ganache.log

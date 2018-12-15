@@ -5,6 +5,25 @@ Ethereum contracts used by Thankful.
 
 [![Build Status](https://travis-ci.org/SuperuserLabs/thankful-contracts.svg?branch=master)](https://travis-ci.org/SuperuserLabs/thankful-contracts)
 
+## How to develop
+
+```sh
+npm install
+make build
+make develop  # start a development chain
+make migrate  # runs migrations
+make test  # run tests
+```
+
+
+For details about how to debug, see this guide: https://truffleframework.com/tutorials/debugging-a-smart-contract
+
+Summary of the guide:
+
+```sh
+npx truffle debug <txid>
+```
+
 
 ## Guides
 

@@ -1,7 +1,22 @@
 .PHONY: build test
 
 build:
-	truffle compile
+	npx truffle compile
+
+develop:
+	npx truffle develop
+
+ganache:
+	npx ganache-cli --port 9545
+
+stop-develop:
+	kill $$(ps -x | grep ganache | awk '{print $$1;}')
+
+migrate:
+	npx truffle migrate
 
 test:
-	truffle test
+	npx truffle test
+
+clean:
+	rm -r build
