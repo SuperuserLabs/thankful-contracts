@@ -7,7 +7,10 @@ install:
 
 script:
  - make build
- - make ganache &
+ - make ganache > ganache.log &
  - sleep 5s
  - make migrate
  - make test
+
+after_script:
+ - cat ganache.log
