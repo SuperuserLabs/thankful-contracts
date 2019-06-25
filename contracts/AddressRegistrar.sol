@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import './AddressRegistrar.sol';
 
+// TODO: Add escape-hatch (clear mapping, and self-destruct?)
 contract AddressRegistrar {
     // TODO: Make contract extend Ownable (for onlyOwner modifiers etc.)
     // https://medium.com/codexprotocol/a-simple-framework-for-deploying-ownable-contracts-63ed4bd3c657
