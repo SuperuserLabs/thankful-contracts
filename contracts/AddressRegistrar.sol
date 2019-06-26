@@ -25,6 +25,12 @@ contract AddressRegistrar {
         creators[_email].addr = _address;
     }
 
+    // Deassociate an email
+    function deassociate(string _email) public {
+        require(msg.sender == owner);
+        delete creators[_email];
+    }
+
     function getAddressByEmail(string _email) public constant returns (address) {
         return creators[_email].addr;
     }

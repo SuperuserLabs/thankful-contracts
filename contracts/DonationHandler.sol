@@ -19,7 +19,7 @@ contract DonationHandler {
     struct Donation {
         address sender;
         uint value;
-        uint256 expires;
+        uint expires;
     }
 
     struct PendingDonations {
@@ -30,7 +30,7 @@ contract DonationHandler {
     }
 
     // Donate to a creator, add to pending if email has no connected address.
-    function donate(string _email, uint32 _expires_in) public payable returns (uint256) {
+    function donate(string _email, uint _expires_in_seconds) public payable returns (uint256) {
         require(msg.value > 0);
         address _addr = registrar.getAddressByEmail(_email);
         if(_addr != 0x0) {
@@ -38,7 +38,7 @@ contract DonationHandler {
             emit DonationCompleted(msg.sender, msg.value);
             return 0;
         } else {
-            uint256 _idx = pending[_email].donations.push(Donation(msg.sender, msg.value, now + _expires_in));
+            uint256 _idx = pending[_email].donations.push(Donation(msg.sender, msg.value, block.timestamp + _expires_in_seconds * 1 seconds));
             pending[_email].n_pending++;
             emit DonationPending(msg.sender, msg.value);
             return _idx;
@@ -47,7 +47,7 @@ contract DonationHandler {
 
     // Refund pending transaction that has expired
     function refund(string _email, uint32 _idx) public {
-        require(now > pending[_email].donations[_idx].expires);
+        require(now >= pending[_email].donations[_idx].expires);
         Donation storage d = pending[_email].donations[_idx];
         d.sender.transfer(d.value);
         delete pending[_email].donations[_idx];
@@ -55,7 +55,7 @@ contract DonationHandler {
         pending[_email].n_pending--;
     }
 
-    // Returns the index of the last added pending donation (might be fulfilled)
+    // Returns the index of the last added pending donation (might already be fulfilled)
     function lastPending(string _email) public constant returns (uint256) {
         return pending[_email].donations.length - 1;
     }
