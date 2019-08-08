@@ -7,7 +7,7 @@ develop:
 	npx truffle develop
 
 ganache:
-	npx ganache-cli --port 9545
+	npx ganache-cli --port 9545 --networkId 5777
 
 stop-develop:
 	kill $$(ps -x | grep ganache | awk '{print $$1;}')
