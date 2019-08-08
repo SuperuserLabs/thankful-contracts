@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import './AddressRegistrar.sol';
 
@@ -20,18 +20,18 @@ contract AddressRegistrar {
     }
 
     // Associate an email with a wallet address
-    function associate(string _email, address _address) public {
+    function associate(string memory _email, address _address) public {
         require(msg.sender == owner);
         creators[_email].addr = _address;
     }
 
     // Deassociate an email
-    function deassociate(string _email) public {
+    function deassociate(string memory _email) public {
         require(msg.sender == owner);
         delete creators[_email];
     }
 
-    function getAddressByEmail(string _email) public constant returns (address) {
+    function getAddressByEmail(string memory _email) public view returns (address) {
         return creators[_email].addr;
     }
 }
