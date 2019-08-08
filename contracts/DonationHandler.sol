@@ -1,6 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 
 import './AddressRegistrar.sol';
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract DonationHandler {
     address public owner;
@@ -8,8 +9,8 @@ contract DonationHandler {
 
     mapping(string => PendingDonations) pending;
 
-    event DonationCompleted(address _sender, uint _value);
-    event DonationPending(address _sender, uint _value);
+    event DonationCompleted(address _sender, ERC20 _tokenContract, uint _tokens);
+    event DonationPending(address _sender, ERC20 _tokenContract, uint _tokens);
 
     constructor(AddressRegistrar _registrar) public {
         owner = msg.sender;
@@ -18,7 +19,8 @@ contract DonationHandler {
 
     struct Donation {
         address sender;
-        uint value;
+        ERC20 tokenContract;
+        uint tokens;
         uint expires;
     }
 
@@ -30,45 +32,51 @@ contract DonationHandler {
     }
 
     // Donate to a creator, add to pending if email has no connected address.
-    function donate(string _email, uint _expires_in_seconds) public payable returns (uint256) {
-        require(msg.value > 0);
+    function donate(string memory _email, uint _expires_in_seconds, ERC20 _tokenContract, uint _tokens) public returns (uint256) {
+        require(_tokenContract.balanceOf(msg.sender) > _tokens && _tokenContract.allowance(msg.sender, address(this)) > _tokens);
+
         address _addr = registrar.getAddressByEmail(_email);
-        if(_addr != 0x0) {
-            _addr.transfer(msg.value);
-            emit DonationCompleted(msg.sender, msg.value);
+        if(_addr != address(0x0)) {
+            _sendDonation(msg.sender, _addr, _tokenContract, _tokens);
             return 0;
         } else {
-            uint256 _idx = pending[_email].donations.push(Donation(msg.sender, msg.value, block.timestamp + _expires_in_seconds * 1 seconds));
-            pending[_email].n_pending++;
-            emit DonationPending(msg.sender, msg.value);
-            return _idx;
+            _addPending(_email, _expires_in_seconds, _tokenContract, _tokens);
         }
     }
 
+    function _sendDonation(address _from, address _to, ERC20 _tokenContract, uint _tokens) private {
+        _tokenContract.transferFrom(_from, _to, _tokens);
+        emit DonationCompleted(_from, _tokenContract, _tokens);
+    }
+
+    function _addPending(string memory _email, uint _expires_in_seconds, ERC20 _tokenContract, uint _tokens) private returns (uint256) {
+        uint256 _idx = pending[_email].donations.push(Donation(msg.sender, _tokenContract, _tokens, block.timestamp + _expires_in_seconds * 1 seconds));
+        pending[_email].n_pending++;
+        emit DonationPending(msg.sender, _tokenContract, _tokens);
+        return _idx;
+    }
+
     // Refund pending transaction that has expired
-    function refund(string _email, uint32 _idx) public {
+    function refund(string memory _email, uint32 _idx) public {
         require(now >= pending[_email].donations[_idx].expires);
-        Donation storage d = pending[_email].donations[_idx];
-        d.sender.transfer(d.value);
         delete pending[_email].donations[_idx];
         pending[_email].n_refunded++;
         pending[_email].n_pending--;
     }
 
     // Returns the index of the last added pending donation (might already be fulfilled)
-    function lastPending(string _email) public constant returns (uint256) {
+    function lastPending(string memory _email) public view returns (uint256) {
         return pending[_email].donations.length - 1;
     }
 
     // Pay out last pending transaction for creator if email has an assigned address
-    function payOut(string _email, uint32 _idx) public {
+    function payOut(string memory _email, uint32 _idx) public {
         address _addr = registrar.getAddressByEmail(_email);
-        require(_addr != 0x0);
+        require(_addr != address(0x0));
 
         Donation storage d = pending[_email].donations[_idx];
-        if(d.value != 0x0) {
-            _addr.transfer(d.value);
-            emit DonationCompleted(d.sender, d.value);
+        if(d.tokens > 0) {
+            _sendDonation(d.sender, _addr, d.tokenContract, d.tokens);
             delete pending[_email].donations[_idx];
             pending[_email].n_donated++;
             pending[_email].n_pending--;
